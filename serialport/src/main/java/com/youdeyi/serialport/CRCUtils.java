@@ -28,6 +28,10 @@ public class CRCUtils {
         return getCRC(para);
     }
 
+    public static void main(String[] args) {
+        System.out.println("args = [" + getCRC("00 05 00") + "]");
+    }
+
 
     /**
      * 计算CRC16校验码

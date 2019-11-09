@@ -29,8 +29,8 @@ public abstract class ICommandParse<T> {
         if(preCommand.length() < 8){
             return;
         }
-        String command = preCommand.substring(0,preCommand.length()-2);
-        String crc = preCommand.substring(preCommand.length()-2,preCommand.length());
+        String command = preCommand.substring(0,preCommand.length()-4);
+        String crc = preCommand.substring(preCommand.length()-4);
         //验证成功
         if(TextUtils.equals(CRCUtils.getCRC(command),crc)){
             parseCommand(preCommand);

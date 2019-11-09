@@ -2,6 +2,8 @@ package com.youdeyi.serialport;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.youdeyi.serialport.data.CheckStatusCommandParseImpl;
 import com.youdeyi.serialport.data.CommonParseImpl;
 import com.youdeyi.serialport.data.ICommandParse;
@@ -30,10 +32,27 @@ public class SerialPortManager {
 
     private SerialPortManager() {
         mRequestInfos = new ArrayList<>();
+        mLoggerProvider = new LoggerProvider() {
+            @Override
+            public void w(String tag, String msg) {
+                Log.w(tag,msg);
+            }
+
+            @Override
+            public void e(String tag, String msg) {
+                Log.w(tag,msg);
+            }
+
+            @Override
+            public void d(String tag, String msg) {
+                Log.w(tag,msg);
+            }
+        };
     }
 
     private List<MotorRequestInfo> mRequestInfos;
     private int requestCount = 0;
+    private LoggerProvider mLoggerProvider;
 
     public static SerialPortManager getInstance() {
         if (instance == null) {
@@ -104,7 +123,7 @@ public class SerialPortManager {
 
             @Override
             public void onError(ErrorCode errorCode) {
-                Log.e(TAG,"轮询指令执行错误："+errorCode.toString());
+                mLoggerProvider.e(TAG,"轮询指令执行错误："+errorCode.toString());
                 reset();
                 callback.onError(errorCode.getErrCode(), errorCode.getMsg());
             }
@@ -120,14 +139,14 @@ public class SerialPortManager {
         sendCommand(Constant.FULL_ACK_CONFIRM, new CommonParseImpl(new ICommandParse.CallBack<String>() {
             @Override
             public void onCommandRecieve(String result) {
-                Log.w(TAG,"第"+requestCount+"个药品出货成功");
+                mLoggerProvider.w(TAG,"第"+requestCount+"个药品出货成功");
                 //轮询指令确认成功
                 if (mRequestInfos.size() > 0) {
                     //移除队列中第一条指令
                     mRequestInfos.remove(0);
                     requestCount--;
                     //继续执行剩余的指令
-                    Log.w(TAG,"开始执行取"+requestCount+"个药品");
+                    mLoggerProvider.w(TAG,"开始执行取"+requestCount+"个药品");
                     startMotor(callback);
                 }
                 callback.onSucccess("出货成功");
@@ -135,7 +154,7 @@ public class SerialPortManager {
 
             @Override
             public void onError(ErrorCode code) {
-                Log.e(TAG,"ACK确认指令未知错误");
+                mLoggerProvider.e(TAG,"ACK确认指令未知错误");
                 reset();
                 callback.onError(code.getErrCode(), code.getMsg());
             }
@@ -147,7 +166,7 @@ public class SerialPortManager {
      */
     public void startMotor(final Callback callback) {
         if (mRequestInfos.size() == 0) {
-            Log.e(TAG, "全部出货完毕");
+            mLoggerProvider.e(TAG, "全部出货完毕");
             callback.onSucccess("全部出货完毕");
             return;
         }
@@ -160,7 +179,7 @@ public class SerialPortManager {
 
             @Override
             public void onError(ErrorCode code) {
-                Log.e(TAG,"启动电机指令错误："+code.toString());
+                mLoggerProvider.e(TAG,"启动电机指令错误："+code.toString());
                 reset();
                 callback.onError(code.getErrCode(), code.getMsg());
             }
@@ -175,13 +194,20 @@ public class SerialPortManager {
 
 
     //********************************暴露给外部的API****************************//
-
     /**
      * 连接所有串口
      * 该方法在application中调用进行初始化
      */
     public void openAllSerial(){
 
+    }
+
+    public void setLoggerProvider(LoggerProvider loggerProvider) {
+        mLoggerProvider = loggerProvider;
+    }
+
+    public LoggerProvider getLoggerProvider() {
+        return mLoggerProvider;
     }
 
     /**
@@ -193,13 +219,13 @@ public class SerialPortManager {
         sendCommand(command, new SearchInfoParseImpl(new ICommandParse.CallBack<String>() {
             @Override
             public void onCommandRecieve(String object) {
-                Log.w(TAG,"主板状态检查完毕    "+object);
+                mLoggerProvider.w(TAG,"主板状态检查完毕    "+object);
                 callback.onSucccess(object);
             }
 
             @Override
             public void onError(ErrorCode errorCode) {
-                Log.e(TAG,"主板状态错误："+errorCode.toString());
+                mLoggerProvider.e(TAG,"主板状态错误："+errorCode.toString());
                 reset();
                 callback.onError(errorCode.getErrCode(), errorCode.getMsg());
             }
@@ -220,13 +246,13 @@ public class SerialPortManager {
     /**
      * 温度控制指令
      */
-    public void tempControl(@TempretureType String type,int tempreture,final Callback callback){
+    public void tempControl(@TempretureType String type, int tempreture, final Callback callback){
         String command = getCommand("02"+Constant.SET_TEMPRETOR+type+ByteUtil.decimal2fitHex(tempreture,4));
         sendCommand(command,new CommonParseImpl(new ICommandParse.CallBack<String>() {
             @Override
             public void onCommandRecieve(String result) {
                 //温度设置成功
-                Log.w(TAG,"温度设置成功    "+result);
+                mLoggerProvider.w(TAG,"温度设置成功    "+result);
                 callback.onSucccess(result);
             }
 
@@ -247,7 +273,7 @@ public class SerialPortManager {
             @Override
             public void onCommandRecieve(String result) {
                 //温度设置成功
-                Log.w(TAG,"制冷控制成功    "+result);
+                mLoggerProvider.w(TAG,"制冷控制成功    "+result);
                 callback.onSucccess(result);
             }
 
@@ -270,7 +296,7 @@ public class SerialPortManager {
             @Override
             public void onCommandRecieve(String result) {
                 //温度设置成功
-                Log.w(TAG,"灯关控制成功    "+result);
+                mLoggerProvider.w(TAG,"灯关控制成功    "+result);
                 callback.onSucccess(result);
             }
 
@@ -281,5 +307,12 @@ public class SerialPortManager {
         }));
     }
 
-
+    /**
+     * 日志打印接口
+     */
+    public interface LoggerProvider{
+        void w(String tag,String msg);
+        void e(String tag,String msg);
+        void d(String tag,String msg);
+    }
 }
