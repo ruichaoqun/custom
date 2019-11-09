@@ -7,6 +7,7 @@ package com.youdeyi.serialport;
  */
 public enum  ErrorCode {
     //
+    ERROR_SERIALPORT_OPEN(200000,"串口打开失败"),
     ERROR_BOARD_OFFLINE(200001,"板卡不在线"),
     ERROR_INVALID_INDEX(200002,"无效的电机索引"),
     ERROR_ORTHER_RUNNING(200003,"另一个电机正在运行"),
@@ -40,5 +41,10 @@ public enum  ErrorCode {
 
     public void setErrCode(int errCode) {
         this.errCode = errCode;
+    }
+
+    @Override
+    public String toString() {
+        return errCode+"   "+msg;
     }
 }

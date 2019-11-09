@@ -12,6 +12,6 @@ public class CommonParseImpl extends ICommandParse<String> {
 
     @Override
     public void parseCommand(String hexStr) {
-
+        mCallBack.onCommandRecieve(hexStr);
     }
 }

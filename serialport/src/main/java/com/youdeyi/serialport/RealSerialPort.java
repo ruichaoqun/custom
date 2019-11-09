@@ -1,6 +1,7 @@
 package com.youdeyi.serialport;
 
 import android.serialport.SerialPort;
+import android.util.Log;
 
 
 import com.youdeyi.serialport.data.ICommandParse;
@@ -58,8 +59,8 @@ public class RealSerialPort{
                 startReceiveCommand();
             } catch (Exception e) {
                 e.printStackTrace();
-//                LogUtil.e(TAG, "串口打开失败" + e.getMessage());
-                mICommandParse.getCallBack().onError("串口打开失败");
+                Log.e(TAG, devicePath+"串口打开失败" + e.getMessage());
+                mICommandParse.getCallBack().onError(ErrorCode.ERROR_SERIALPORT_OPEN);
                 SerialPortManager.getInstance().close();
             }
         }
@@ -75,7 +76,7 @@ public class RealSerialPort{
     public void sendCommand(final String hexStr) {
         if (mSerialPort == null) {
 //            LogUtil.e(TAG, "打开串口失败");
-            mICommandParse.getCallBack().onError("串口打开失败");
+            mICommandParse.getCallBack().onError(ErrorCode.ERROR_SERIALPORT_OPEN);
             SerialPortManager.getInstance().close();
             return;
         }
