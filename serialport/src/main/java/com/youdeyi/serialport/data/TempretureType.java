@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * @author Rui Chaoqun
  * @date :2019/11/9 10:21
- * description:
+ * description:温度控制类型
  */
 @StringDef(value = {TempretureType.NORMAL,
         TempretureType.COLD,

@@ -1,5 +1,6 @@
 package com.youdeyi.serialport;
 
+import android.annotation.SuppressLint;
 import android.serialport.SerialPort;
 
 
@@ -72,6 +73,7 @@ public class RealSerialPort{
      *
      * @param hexStr 指令
      */
+    @SuppressLint("CheckResult")
     public void sendCommand(final String hexStr) {
         if (mSerialPort == null) {
             SerialPortManager.getInstance().getLoggerProvider().e(TAG, devicePath+"打开串口失败");
@@ -79,6 +81,7 @@ public class RealSerialPort{
             SerialPortManager.getInstance().close();
             return;
         }
+        SerialPortManager.getInstance().getLoggerProvider().w(TAG, devicePath+"   发送指令："+hexStr);
         Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
             public void subscribe(ObservableEmitter<Boolean> emitter) throws Exception {
@@ -90,7 +93,19 @@ public class RealSerialPort{
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe();
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        SerialPortManager.getInstance().getLoggerProvider().w(TAG, devicePath+"   发送指令："+hexStr+"失败");
+                        mICommandParse.getCallBack().onError(ErrorCode.ERROR_SEND_COMMAND);
+                        SerialPortManager.getInstance().close();
+                    }
+                });
     }
 
     /**
@@ -108,15 +123,15 @@ public class RealSerialPort{
                             int size = inputStream.read(received);
                             if (size > 0) {
                                 String hexStr = ByteUtil.bytes2HexStr(received, 0, size);
+                                SerialPortManager.getInstance().getLoggerProvider().w(TAG, devicePath+"   应答指令："+hexStr);
                                 mICommandParse.parseCommand(hexStr);
-//                                mHandler.sendMessage(mHandler.obtainMessage(1,hexStr));
-//                                onDataReceive(hexStr);
                             }
                         }
                     }
                 });
     }
 
+    //重定向回调接口
     public void setICommandParse(ICommandParse ICommandParse) {
         this.mICommandParse = ICommandParse;
         this.mICommandParse.setRealSerialPort(this);

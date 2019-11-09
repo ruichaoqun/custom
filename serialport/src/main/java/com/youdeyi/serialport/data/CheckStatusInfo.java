@@ -3,7 +3,7 @@ package com.youdeyi.serialport.data;
 /**
  * @author Rui Chaoqun
  * @date :2019/11/8 15:13
- * description:
+ * description:轮询指令解析info
  */
 public class CheckStatusInfo {
     //控制板状态 0=空闲 1=出货中 2=出货结束（注意仅表示结束， 不代表成功或者失败）。

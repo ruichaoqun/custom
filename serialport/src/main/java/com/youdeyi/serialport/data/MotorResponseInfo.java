@@ -5,7 +5,7 @@ import com.youdeyi.serialport.ErrorCode;
 /**
  * @author Rui Chaoqun
  * @date :2019/11/8 17:04
- * description:
+ * description:电机运行应答指令
  */
 public class MotorResponseInfo extends ICommandParse<String> {
 
@@ -31,9 +31,6 @@ public class MotorResponseInfo extends ICommandParse<String> {
                 break;
                 default:
                     mCallBack.onError(ErrorCode.ERROR_UNKNOWN);
-        }
-        if(state == 0){
-
         }
     }
 }

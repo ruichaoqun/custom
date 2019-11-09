@@ -6,7 +6,7 @@ import com.youdeyi.serialport.ErrorCode;
 /**
  * @author Rui Chaoqun
  * @date :2019/11/8 14:38
- * description:
+ * description:轮询指令应答指令处理类
  */
 public class CheckStatusCommandParseImpl extends ICommandParse<String>{
 
@@ -32,7 +32,6 @@ public class CheckStatusCommandParseImpl extends ICommandParse<String>{
                 return;
                 default:
         }
-
 
         switch (info.getState()){
             case 0:

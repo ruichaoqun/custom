@@ -2,8 +2,6 @@ package com.youdeyi.serialport;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.youdeyi.serialport.data.CheckStatusCommandParseImpl;
 import com.youdeyi.serialport.data.CommonParseImpl;
 import com.youdeyi.serialport.data.ICommandParse;
@@ -28,9 +26,12 @@ public class SerialPortManager {
 
     private volatile static SerialPortManager instance;
 
-    private Map<String, RealSerialPort> serialPortMap = new HashMap<>();
+    //串口集合
+    private Map<String, RealSerialPort> serialPortMap;
+
 
     private SerialPortManager() {
+        serialPortMap = new HashMap<>();
         mRequestInfos = new ArrayList<>();
         mLoggerProvider = new LoggerProvider() {
             @Override
@@ -50,8 +51,10 @@ public class SerialPortManager {
         };
     }
 
+    //取货指令集合
     private List<MotorRequestInfo> mRequestInfos;
     private int requestCount = 0;
+    //外部获取详细日志的接口
     private LoggerProvider mLoggerProvider;
 
     public static SerialPortManager getInstance() {
@@ -65,7 +68,13 @@ public class SerialPortManager {
         return instance;
     }
 
-
+    /**
+     * 获取指定的串口，如果不存在则新建，如果已存在则重新设置回调方法
+     * @param path 串口id
+     * @param baudrateString 串口波特率
+     * @param iCommandParse 回调接口
+     * @return 串口
+     */
     private RealSerialPort getSerialPort(String path, String baudrateString, ICommandParse iCommandParse) {
         if (serialPortMap.containsKey(path)) {
             RealSerialPort s = serialPortMap.get(path);
@@ -77,7 +86,10 @@ public class SerialPortManager {
         return serialPort;
     }
 
-    public void close() {
+    /**
+     * 关闭所有串口
+     */
+    void close() {
         for (RealSerialPort port : serialPortMap.values()) {
             port.close();
         }
@@ -85,7 +97,7 @@ public class SerialPortManager {
     }
 
     /**
-     * 指定断开串口连接
+     * 指定关闭串口
      *
      * @param path 串口地址
      */
@@ -99,21 +111,29 @@ public class SerialPortManager {
         }
     }
 
+    //根据CRC校验工具获取校验码再与指令拼接成完整指令
     private String getCommand(String str) {
         return str + CRCUtils.getCRC(str);
     }
 
+    /**
+     * 发送指令 TODO 暂时默认全部串口都相同，后面要确认各指令对应的串口地址
+     * @param command 指令
+     * @param iCommandParse 回调
+     */
     private void sendCommand(String command, ICommandParse iCommandParse) {
         getSerialPort(Device.getSearchInfoDevice().getPort(), Device.getSearchInfoDevice().getDaud(), iCommandParse).sendCommand(command);
     }
 
 
     /**
-     * 开启轮询
+     * 开启轮询指令，该指令轮询查询出货指令的执行情况
+     * 当确认出货已经成功且检测到货物掉落后将执行ACK指令来清空数据
+     * ACK指令执行成功后才可以执行下一个出货指令
      *
-     * @param callback
+     * @param callback 回调
      */
-    public void checkStatus(final Callback callback) {
+    private void checkStatus(final Callback callback) {
         sendCommand(Constant.FULL_POLL_STSTUS, new CheckStatusCommandParseImpl(new ICommandParse.CallBack<String>() {
             @Override
             public void onCommandRecieve(String object) {
@@ -133,7 +153,7 @@ public class SerialPortManager {
     /**
      * 发送ack确认指令
      *
-     * @param callback
+     * @param callback 回调
      */
     private void sendAckCommand(final Callback callback) {
         sendCommand(Constant.FULL_ACK_CONFIRM, new CommonParseImpl(new ICommandParse.CallBack<String>() {
@@ -164,7 +184,7 @@ public class SerialPortManager {
     /**
      * 启动单个电机
      */
-    public void startMotor(final Callback callback) {
+    private void startMotor(final Callback callback) {
         if (mRequestInfos.size() == 0) {
             mLoggerProvider.e(TAG, "全部出货完毕");
             callback.onSucccess("全部出货完毕");
@@ -206,13 +226,13 @@ public class SerialPortManager {
         mLoggerProvider = loggerProvider;
     }
 
-    public LoggerProvider getLoggerProvider() {
+    LoggerProvider getLoggerProvider() {
         return mLoggerProvider;
     }
 
     /**
      * 检查主板状态
-     * @param callback
+     * @param callback 回调
      */
     public void checkConnect(final Callback callback) {
         String command = getCommand("01" + Constant.SEARCH_STATE);
@@ -233,7 +253,7 @@ public class SerialPortManager {
     }
 
     /**
-     * 启动电机，不论单个多个都是走这个方法去启动电机
+     * 启动电机，不论单个、多个还是单路、多路都是走这个方法去启动电机
      * @param list 电机列表
      * @param callback 出货回调
      */

@@ -2,6 +2,8 @@ package com.youdeyi.serialport;
 
 import android.text.TextUtils;
 
+import com.youdeyi.serialport.data.CheckStatusInfo;
+
 /**
  * @author Rui Chaoqun
  * @date :2019/11/8 14:24
@@ -10,7 +12,8 @@ import android.text.TextUtils;
 public class Test {
 
     public static void main(String[] args) {
-        verifyCommand("0005007290");
+//        verifyCommand("0005007290");
+        CheckStatusInfo.parseCheckStatusInfo("00 03 02 00 00 01 44 00 91 07 D8 4D D2 ");
     }
 
     public static void verify1() {

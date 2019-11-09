@@ -5,7 +5,7 @@ import com.youdeyi.serialport.ByteUtil;
 /**
  * @author Rui Chaoqun
  * @date :2019/11/8 11:55
- * description:
+ * description:查看状态指令应答指令
  */
 public class SearchInfoParseImpl extends ICommandParse<String> {
     public SearchInfoParseImpl(CallBack callBack) {

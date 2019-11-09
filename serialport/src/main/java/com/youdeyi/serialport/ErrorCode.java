@@ -3,19 +3,20 @@ package com.youdeyi.serialport;
 /**
  * @author Rui Chaoqun
  * @date :2019/11/8 10:20
- * description:
+ * description:错误码
  */
 public enum  ErrorCode {
     //
     ERROR_SERIALPORT_OPEN(200000,"串口打开失败"),
+    ERROR_SEND_COMMAND(200008,"串口打开失败"),
     ERROR_BOARD_OFFLINE(200001,"板卡不在线"),
     ERROR_INVALID_INDEX(200002,"无效的电机索引"),
     ERROR_ORTHER_RUNNING(200003,"另一个电机正在运行"),
     ERROR_OTHER_RESULT_NOT_TAKE_OFF(200004,"另一台电机的运转结果还未取走"),
-    ERROR_UNKNOWN(-1,"未知错误"),
     ERROR_OVER_CURRENT(200005,"过流"),
     ERROR_OFFLINE(200006,"断线"),
     ERROR_OVERTIME(200007,"超时"),
+    ERROR_UNKNOWN(-1,"未知错误"),
     ;
 
 

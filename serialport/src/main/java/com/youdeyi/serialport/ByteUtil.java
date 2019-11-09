@@ -6,19 +6,6 @@ package com.youdeyi.serialport;
  */
 public class ByteUtil {
 
-    //public static void main(String[] args) {
-    //    byte[] bytes = {
-    //        (byte) 0xab, 0x01, 0x11
-    //    };
-    //    String hexStr = bytes2HexStr(bytes);
-    //    System.out.println(hexStr);
-    //    System.out.println(hexStr2decimal(hexStr));
-    //    System.out.println(decimal2fitHex(570));
-    //    String adc = "abc";
-    //    System.out.println(str2HexString(adc));
-    //    System.out.println(bytes2HexStr(adc.getBytes()));
-    //}
-
     /**
      * 字节数组转换成对应的16进制表示的字符串
      *
