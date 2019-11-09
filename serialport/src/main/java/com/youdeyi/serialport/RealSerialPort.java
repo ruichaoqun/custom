@@ -118,6 +118,11 @@ public class RealSerialPort{
                 });
     }
 
+    public void setICommandParse(ICommandParse ICommandParse) {
+        this.mICommandParse = ICommandParse;
+        this.mICommandParse.setRealSerialPort(this);
+    }
+
     /**
      * 关闭串口
      */

@@ -49,6 +49,8 @@ public class SerialPortManager {
 
     private RealSerialPort getSerialPort(String path, String baudrateString, ICommandParse iCommandParse) {
         if (serialPortMap.containsKey(path)) {
+            RealSerialPort s = serialPortMap.get(path);
+            s.setICommandParse(iCommandParse);
             return serialPortMap.get(path);
         }
         RealSerialPort serialPort = new RealSerialPort(path, baudrateString, iCommandParse);
